@@ -1,0 +1,27 @@
+# Giữ Docker build context nhỏ gọn và không đưa secrets vào image
+.git
+.github
+.env
+.env.*
+!.env.example
+.venv
+venv
+__pycache__
+*.py[cod]
+.pytest_cache
+.mypy_cache
+.ruff_cache
+outputs
+.cache
+hf_cache
+models
+weights
+checkpoints
+*.safetensors
+*.bin
+*.pt
+*.pth
+*.gguf
+.vscode
+.idea
+.DS_Store
