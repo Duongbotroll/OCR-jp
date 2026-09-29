@@ -1,0 +1,25 @@
+# =============================================================================
+# Japanese Handwritten OCR - Core dependencies (NHẸ, không có PyTorch)
+# Python >= 3.10
+#
+# File này đủ để chạy app với OCR qua API (OCR_BACKEND=openai-compatible:
+# Gemini / OpenAI / vLLM server). Đây cũng là file Streamlit Community Cloud
+# tự động cài khi deploy.
+#
+# Muốn chạy model VLM trên máy (Qwen2.5-VL, GLM-OCR, GOT-OCR2) cần GPU:
+#   pip install -r requirements-gpu.txt
+# =============================================================================
+
+# --- Xử lý ảnh & tài liệu ----------------------------------------------------
+numpy>=1.26,<3.0
+opencv-python-headless>=4.9,<5.0
+Pillow>=10.3
+PyMuPDF>=1.24              # Render PDF -> ảnh, không cần cài Poppler
+python-dotenv>=1.0
+
+# --- LLM / VLM qua API -------------------------------------------------------
+openai>=1.40               # OpenAI + mọi server tương thích (Gemini, vLLM, Ollama...)
+anthropic>=0.40            # Anthropic Claude
+
+# --- Web UI ------------------------------------------------------------------
+streamlit>=1.40,<2.0
