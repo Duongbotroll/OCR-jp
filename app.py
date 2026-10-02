@@ -15,6 +15,7 @@ import json
 import os
 from typing import Any
 
+import cv2
 import numpy as np
 import streamlit as st
 
@@ -61,6 +62,29 @@ STEP_LABELS: dict[str, str] = {
     "05_cropped": "Border cropped",
     "06_binary": "Binary (layout map)",
 }
+
+
+# ---------------------------------------------------------------------------
+# Hiển thị ảnh OpenCV
+# ---------------------------------------------------------------------------
+def show_image(target: Any, image: np.ndarray, caption: str) -> None:
+    """Hiển thị ảnh OpenCV lên Streamlit một cách an toàn.
+
+    OpenCV lưu ảnh màu theo thứ tự BGR, còn Streamlit hiển thị RGB. Ta tự chuyển
+    BGR -> RGB cho ảnh 3 kênh và giữ nguyên ảnh xám 2 chiều, thay vì dùng tham số
+    ``channels="BGR"`` (các phiên bản Streamlit mới báo lỗi khi tham số này đi kèm
+    ảnh xám).
+
+    Args:
+        target: Nơi hiển thị (``st``, một cột ``st.columns``...).
+        image: Ảnh numpy dạng BGR (3 kênh) hoặc xám (2 chiều).
+        caption: Chú thích dưới ảnh.
+    """
+    if image.ndim == 3 and image.shape[2] == 3:
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    elif image.ndim == 3 and image.shape[2] == 4:
+        image = cv2.cvtColor(image, cv2.COLOR_BGRA2RGBA)
+    target.image(image, caption=caption)
 
 
 # ---------------------------------------------------------------------------
@@ -320,8 +344,8 @@ def render_page_result(item: dict[str, Any], run_id: int) -> None:
         for start in range(0, len(step_items), 3):
             row = st.columns(3)
             for col, (key, image) in zip(row, step_items[start : start + 3]):
-                col.image(image, caption=STEP_LABELS.get(key, key), channels="BGR")
-        st.image(item["overlay"], caption="Layout analysis & reading order", channels="BGR")
+                show_image(col, image, STEP_LABELS.get(key, key))
+        show_image(st, item["overlay"], "Layout analysis & reading order")
 
     with tab_ocr:
         st.caption(f"Backend: `{ocr.backend}` · Model: `{ocr.model_id}` · Mode: `{ocr.mode}`")
@@ -403,7 +427,7 @@ def main() -> None:
     with st.expander("Preview", expanded=False):
         preview_cols = st.columns(min(4, len(pages)))
         for index, page in enumerate(pages[:4]):
-            preview_cols[index].image(page, caption=f"Page {index + 1}", channels="BGR")
+            show_image(preview_cols[index], page, f"Page {index + 1}")
 
     if st.button("🚀 Run OCR pipeline", type="primary"):
         try:
